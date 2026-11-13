@@ -78,6 +78,8 @@ h1.one .ln { display: inline; }
 .q { margin: 0; font: 700 1.6rem/1.15 var(--font-display); text-wrap: balance; }
 .hint { margin: 0; color: var(--muted); font-size: 15px; }
 .choices { display: flex; flex-direction: column; gap: 10px; }
+.sgroup { display: flex; flex-direction: column; gap: 8px; }
+.sg { margin: 0; font: 700 1.05rem/1.2 var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
 button {
   font: 600 1.05rem/1.2 var(--font-body); color: var(--fg); background: var(--surface);
   border: 1.5px solid var(--line); border-radius: 10px; padding: 15px 16px; min-height: 52px;
@@ -87,6 +89,8 @@ button small { font-weight: 400; color: var(--muted); font-size: 14px; }
 button:hover { border-color: var(--accent); }
 button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
 button.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); justify-content: center; text-align: center; }
+.navrow { display: flex; justify-content: space-between; align-items: center; }
+.navrow button.link { align-self: auto; }
 button.link { background: none; border: none; padding: 8px 0; min-height: 0; color: var(--muted); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; justify-content: flex-start; align-self: flex-start; }
 .tile { flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 4px; padding: 18px 16px; }
 .tile .t { font: 700 1.35rem/1.1 var(--font-display); }
@@ -174,56 +178,60 @@ input[type="number"] {
   /* Arizona statutes for conveyances that are NOT e-bikes. Order follows the Quick Reference PDF. */
   var STATUTES = [
     { sec: 3151, num: "ARS 28-3151(A)", label: "No valid license / required motorcycle privilege", title: "Driver license requirement; definition", pts: [
-      "A valid driver license, with the right endorsement, is required to drive a motor vehicle on a highway.",
-      "Driving an off-highway vehicle in Arizona also requires a valid license.",
-      "If the violator is a minor, the citation can go to a parent or guardian. Under 12, it goes to the parent or guardian. At 12 to under 16, it goes to the minor or the parent, not both.",
-      "“Highway” means the full width of a public road maintained by a government, if any part is open to ordinary vehicle travel."
+      "(A) A valid driver license with the proper endorsement is required to drive a motor vehicle on a highway.",
+      "(D) For this section, “highway” is the full width of a public way maintained by the federal government, the state or a city, town or county, if any part is open to public vehicle travel."
     ]},
     { sec: 2153, num: "ARS 28-2153(A)", label: "Unregistered motor vehicle", title: "Registration requirement; exceptions; assessment; violation; classification", pts: [
-      "A motor vehicle, trailer or semitrailer may not be operated, moved or left on a highway unless it is registered with the department for the current registration year.",
-      "A vehicle registered for the current year by the state or country where its owner or lessee resides also satisfies the requirement.",
-      "Subsection A itself states no penalty."
+      "A motor vehicle, trailer or semitrailer may not be operated, moved or left standing on a highway unless it is registered with the department for the current registration year.",
+      "A vehicle properly registered for the current year by the state or country where its owner or lessee resides also satisfies the requirement.",
+      "Exemptions in subsection D include farm tractors, golf carts used on a golf course or only incidentally on a highway, and ATVs on unmaintained dirt roads in unincorporated areas."
     ]},
     { sec: 2532, num: "ARS 28-2532", label: "No current registration (civil penalty)", title: "Registration; violation; civil penalty; dismissal", pts: [
-      "An owner or operator of a vehicle that must be registered but is unregistered, or lacks current plates, faces a $300 civil penalty if it is driven on a highway or the person lets someone else drive it there.",
-      "The case is dismissed if the defendant gets proper plates or registration afterward.",
-      "The court may choose not to impose the penalty on an operator who is not the owner."
+      "An owner or driver of a vehicle that must be registered in Arizona, but is unregistered or lacks current-year plates, faces a $300 civil penalty if it is driven on a highway, or if the person knowingly allows it to be driven there.",
+      "The court must dismiss the case if the defendant obtains the proper plates or registration afterward.",
+      "The court may decline to impose the penalty on a driver who did not own the vehicle."
     ]},
-    { sec: 4135, num: "ARS 28-4135(A)", label: "No required liability insurance", title: "Motor vehicle financial responsibility requirement; civil penalties; restricted driving privilege; evidence at hearing", pts: [
-      "A vehicle driven on a state highway must be covered by liability insurance or an approved alternative.",
-      "The driver must carry proof of coverage, which can be shown on a phone. Not showing it when an officer asks is a civil violation. It is dismissed if the person proves by the court date that coverage was in place.",
-      "First violation: minimum $500 penalty and a three-month suspension or restriction of driving privileges.",
-      "Second violation within 36 months: minimum $750 and a six-month suspension of license and registration.",
-      "Third or more within 36 months: minimum $1,000 and a one-year suspension."
+    { sec: 4135, num: "ARS 28-4135(A)–(E)", label: "No required liability insurance", title: "Motor vehicle financial responsibility requirement; civil penalties; restricted driving privilege; evidence at hearing", pts: [
+      "(A) A vehicle driven on a highway of this state must be covered by liability insurance meeting the statutory limits, or an approved alternative such as a certificate of self-insurance.",
+      "(B) The driver must carry proof of current coverage. It may be shown on a phone, and showing it is not consent to a search of the phone.",
+      "(C, D) Failing to show proof when an officer asks during an accident investigation or an alleged violation is a civil traffic violation. The citation is dismissed if the person proves to the court by the date set that coverage was in place when cited.",
+      "(E) First violation: minimum $500 and a three-month suspension or restricted driving privilege. Second within 36 months: minimum $750, a six-month license suspension, and suspension of registration and plates. Third or more within 36 months: minimum $1,000, a one-year suspension of license, registration and plates, and proof of financial responsibility to reinstate.",
+      "Section 28-4137 creates exceptions to these penalties."
     ]},
-    { sec: 2354, num: "ARS 28-2354(A)/(B)", label: "No / improperly displayed license plate", title: "License plates; attachment; civil penalty", pts: [
-      "Plates must be displayed on the rear of motor vehicles, motorcycles, trailers and semitrailers, with front-and-rear options for certain vehicles.",
-      "Plates must stay displayed until their lawful use expires or is canceled or revoked.",
-      "Plates must be legible, securely fastened so they do not swing, at least 12 inches above the ground, and in a clearly visible position.",
-      "Obscuring the state name at the top of the plate carries a $30 civil penalty, or $100 for a repeat within 12 months."
+    { sec: 2354, num: "ARS 28-2354(A)–(F)", label: "No / improperly displayed license plate", title: "License plates; attachment; civil penalty", pts: [
+      "(A) Plates go on the rear of motor vehicles, motorcycles, trailers and semitrailers. A vehicle issued two plates may display one on the front and one on the rear.",
+      "(B) Plates stay displayed until their lawful use expires or is canceled or revoked. They must be legible, securely fastened so they do not swing, at least 12 inches above the ground, and clearly visible.",
+      "(C) The state name at the top of the plate must not be obscured.",
+      "(D) Without department authorization, no covering, substance, electronic device or film may obscure the plate’s numbers, characters, year tabs or issuing state name.",
+      "(E) An officer may not stop or cite a driver solely for a subsection C violation unless the officer has reasonable cause to believe another motor vehicle law was violated.",
+      "(F) A subsection C violation is a $30 civil penalty, or $100 if within 12 months of a prior one."
     ]},
-    { sec: 964, num: "ARS 28-964(A)", label: "Helmet required (under 18); eye protection", title: "Motorcycles; all-terrain vehicles; motor driven cycles; equipment; exception; citations; civil penalty; community restitution", pts: [
-      "This section covers motorcycles, all-terrain vehicles and motor driven cycles.",
-      "Operators and passengers under 18 must wear a properly secured protective helmet. Operators must also wear eye protection unless the vehicle has a windshield.",
-      "Only 16- and 17-year-olds who hold a license or permit can be cited. A first violation is a $100 civil penalty or community service.",
-      "An adult operator can be cited if an under-18 passenger is not wearing a helmet."
+    { sec: 964, num: "ARS 28-964(A), (C), (D)", label: "Helmet required (under 18); eye protection", title: "Motorcycles; all-terrain vehicles; motor driven cycles; equipment; exception; citations; civil penalty; community restitution", pts: [
+      "(A) Operators and passengers under 18 on a motorcycle, all-terrain vehicle or motor driven cycle must wear a properly secured protective helmet. Operators must also wear eye protection unless the vehicle has a windshield.",
+      "(A) Exemptions include electric or enclosed-cab three-wheeled vehicles, farm vehicles used for agricultural work, certain all-terrain vehicles, and operation on private property.",
+      "(A, D) An officer may cite for a helmet violation only a 16- or 17-year-old who holds a driver license or permit. A first violation is a $100 civil penalty or community service.",
+      "(C) An operator 18 or older may be cited if a passenger under 18 is not wearing a helmet, or if an under-18 operator or passenger in the same group or party is not wearing one."
     ]},
-    { sec: 904, num: "ARS 28-904(A)", label: "Motor vehicle on sidewalk", title: "Driving on sidewalk", pts: [] },
-    { sec: 924, num: "ARS 28-924(B)", label: "Motorcycle without required headlamp", title: "Motor vehicle head lamps", pts: [
-      "Most motor vehicles must have at least two headlamps, one on each side of the front.",
-      "Motorcycles, all-terrain vehicles and motor driven cycles must have at least one and not more than two headlamps.",
+    { sec: 904, num: "ARS 28-904(A)", label: "Motor vehicle on sidewalk", title: "Driving on sidewalk", pts: [
+      "(A) A person may not drive a vehicle on a sidewalk area except on a permanent or duly authorized temporary driveway.",
+      "(B) Exceptions include motorized wheelchairs, electric personal assistive mobility devices, personal mobile cargo carrying devices, authorized emergency vehicles, and certain government-owned security or small service vehicles."
+    ]},
+    { sec: 924, num: "ARS 28-924(A)–(C)", label: "Motorcycle without required headlamp", title: "Motor vehicle head lamps", pts: [
+      "(A) Most motor vehicles must have at least two headlamps, one on each side of the front.",
+      "(B) Motorcycles, all-terrain vehicles and motor driven cycles must have at least one and not more than two headlamps.",
+      "(C) On any motor vehicle, headlamps must be mounted not more than 54 inches and not less than 22 inches high, measured as provided in section 28-923(B).",
       "Headlamps must meet the article’s requirements and limits."
     ]},
-    { sec: 815, num: "ARS 28-815(D)", label: "Motor vehicle in bicycle lane", title: "Riding on roadway and bicycle path; bicycle path usage", pts: [
-      "A path or lane designated for bicycles is for the exclusive use of bicycles.",
-      "Vehicles may not be operated, stopped, parked or left standing in a designated bicycle path or lane, except in an emergency or to cross it to reach a road or driveway.",
-      "Bicyclists on a roadway generally ride as close as practicable to the right edge, with exceptions, and no more than two abreast.",
-      "This section states no penalty."
+    { sec: 815, num: "ARS 28-815(C)–(E)", label: "Motor vehicle in bicycle lane", title: "Riding on roadway and bicycle path; bicycle path usage", pts: [
+      "(C) A path or lane designated as a bicycle path or lane by state or local authority is for the exclusive use of bicycles, even where other uses are permitted.",
+      "(D) No one may operate, stop, park or leave a vehicle in a designated bicycle path or lane, except in an emergency or to cross it to reach a road or driveway.",
+      "(E) Subsection D does not prohibit use of the path or lane by the appropriate local authority.",
+      "(A, B) A bicyclist on a roadway moving slower than traffic rides as close as practicable to the right edge, with exceptions, and no more than two abreast."
     ]},
     { sec: 3511, num: "ARS 28-3511(A)(1)(b)", label: "20-day impound", title: "Removal and immobilization or impoundment of vehicle; Arizona crime information center database", pts: [
       "An officer must remove and either immobilize or impound a vehicle in several situations.",
-      "Under (A)(1)(b): the driver has never been issued a valid driver license or permit by Arizona and cannot show evidence of ever having a valid license or permit from another jurisdiction.",
-      "A vehicle removed under subsection A is immobilized or impounded for 20 days, with exceptions in other provisions of the article."
+      "Under (A)(1)(b): the driver has never been issued a valid driver license or permit by Arizona and cannot show a valid license or permit ever issued by another jurisdiction. This does not apply to operating an implement of husbandry.",
+      "A vehicle removed under subsection A, B or C is immobilized or impounded for 20 days. A vehicle removed for obstructing a highway, (A)(4), is held seven days."
     ]}
   ];
 
@@ -248,8 +256,8 @@ input[type="number"] {
       "Excludes electric bicycles, electric miniature scooters, electric standup scooters and motorized skateboards, among other things."
     ]},
     { sec: 101, num: "ARS 28-101 ¶ 49", label: "Moped", title: "Definitions", pts: [
-      "A bicycle with a helper motor. Excludes electric bicycles and electric scooters.",
-      "Must also meet engine size, horsepower and speed limits, with a maximum of 25 mph on level ground."
+      "A bicycle with a helper motor. Excludes electric bicycles, electric miniature scooters and electric standup scooters.",
+      "The motor must be 50 cc or less and 1.5 brake horsepower or less, with a top speed of 25 mph or less on a flat surface (less than a 1% grade)."
     ]},
     { sec: 101, num: "ARS 28-101 ¶ 11", label: "Bicycle", title: "Definitions", pts: [
       "A human-powered device, including a racing wheelchair, with two tandem wheels or three wheels in contact with the ground, at least one of them over 16 inches in diameter."
@@ -271,9 +279,8 @@ input[type="number"] {
       "A red rear lamp visible from 500 feet is optional, in addition to the reflector."
     ]},
     { href: ORD, link: "Read Ordinance 5164 ↗", num: "Chandler Code 13-8.1", label: "Pedestrians and speed", title: "Pedestrian right-of-way and speed", pts: [
-      "Riders must yield to pedestrians on sidewalks and shared-use paths and keep a reasonable and prudent speed.",
       "Class 1 and Class 2 e-bikes are capped at 15 mph on sidewalks, shared-use paths and in city parks.",
-      "They must slow to 5 mph when passing a pedestrian on those same routes."
+      "They must slow to 5 mph when passing a pedestrian and must yield to pedestrians on those same routes."
     ]},
     { href: ORD, link: "Read Ordinance 5164 ↗", num: "Chandler Code 13-8.3", label: "Traffic laws apply", title: "Applicability of traffic laws", pts: [
       "All traffic laws apply to people operating bicycles or electric bicycles.",
@@ -283,8 +290,7 @@ input[type="number"] {
       "No person under the age of 16 may operate a Class 3 electric bicycle."
     ]},
     { href: ORD, link: "Read Ordinance 5164 ↗", num: "Chandler Code 13-9.2", label: "Under 18 without a helmet", title: "Helmet required", pts: [
-      "Everyone under 18 must wear a helmet when operating an electric bicycle.",
-      "The helmet must meet minimum testing and safety standards approved by the bicycle industry."
+      "Everyone under 18 must wear a helmet when operating an electric bicycle."
     ]},
     { href: ORD, link: "Read Ordinance 5164 ↗", num: "Chandler Code 13-9.3", label: "Class 3 in a prohibited area", title: "Location restrictions", pts: [
       "Class 3 e-bikes are prohibited on sidewalks, in city parks and on shared-use paths in Chandler.",
@@ -315,12 +321,16 @@ input[type="number"] {
   ];
 
   var SPEEDS = [
-    { label: "More than 28 MPH", sub: "", cls: null, why: "It goes faster than 28 MPH." },
-    { label: "Up to 28 MPH", sub: "throttle only", cls: null, why: "A throttle-only bike that goes past 20 MPH is not in any e-bike class." },
-    { label: "Up to 28 MPH", sub: "pedal assist", cls: 3, why: "Pedal assist only, up to 28 MPH." },
-    { label: "Up to 20 MPH", sub: "throttle only", cls: 2, why: "Throttle-powered, up to 20 MPH." },
-    { label: "Up to 20 MPH", sub: "pedal assist", cls: 1, why: "Pedal assist only, up to 20 MPH." }
+    { group: "pedal", label: "Helps above 28 MPH", cls: null, why: "The motor keeps helping above 28 MPH." },
+    { group: "pedal", label: "Stops helping at 28 MPH", cls: 3, why: "Pedal assist only. The motor stops helping at 28 MPH." },
+    { group: "pedal", label: "Stops helping at 20 MPH", cls: 1, why: "Pedal assist only. The motor stops helping at 20 MPH." },
+    { group: "throttle", label: "Helps above 20 MPH", cls: null, why: "A throttle that keeps helping past 20 MPH is not in any e-bike class." },
+    { group: "throttle", label: "Stops helping at 20 MPH", cls: 2, why: "Throttle. The motor stops helping at 20 MPH." }
   ];
+  var SPEED_GROUPS = {
+    pedal: ["Pedal assist", "Motor helps only while you pedal."],
+    throttle: ["Throttle (no pedaling needed)", "Motor can move the bike with no pedaling."]
+  };
 
   var stage = document.getElementById("stage");
   var band = document.getElementById("band");
@@ -342,7 +352,11 @@ input[type="number"] {
   function go(step) { state.stack.push(state.step); state.step = step; render(); }
   function back() { state.step = state.stack.pop() || "home"; render(); }
   function restart() { state = fresh(); render(); }
-  function backLink() { var b = el("button", { type: "button", "class": "link", text: "Back" }); b.onclick = back; return b; }
+  function backLink() {
+    var b = el("button", { type: "button", "class": "link", text: "Back" }); b.onclick = back;
+    var m = el("button", { type: "button", "class": "link", text: "Main Screen" }); m.onclick = restart;
+    return el("div", { "class": "navrow" }, [b, m]);
+  }
   function mainLink(primary) {
     var b = el("button", { type: "button", "class": primary ? "primary" : "link", text: "Back to main screen" });
     b.onclick = restart; return b;
@@ -418,6 +432,7 @@ input[type="number"] {
   function stepPedals() {
     return el("div", { "class": "card" }, [
       el("h2", { "class": "q", text: "Does it have fully operable pedals?" }),
+      el("p", { "class": "hint", text: "Pedals that turn the drive system and actually make the bike move." }),
       el("div", { "class": "choices" }, [
         choice("Yes", "", function () { go("watts"); }),
         choice("No", "", function () { state.speed = null; state.watts = null; state.noReason = "pedals"; go("result"); })
@@ -452,13 +467,25 @@ input[type="number"] {
   }
 
   function stepSpeed() {
-    var list = el("div", { "class": "choices" }, SPEEDS.map(function (s) {
-      return choice(s.label, s.sub, function () {
-        state.speed = s; state.noReason = null;
-        if (s.cls === 3) go("age"); else go("result");
-      });
-    }));
-    return el("div", { "class": "card" }, [el("h2", { "class": "q", text: "How fast does it go?" }), list, backLink()]);
+    var kids = [
+      el("h2", { "class": "q", text: "How fast does the motor help?" }),
+      el("p", { "class": "hint", text: "The speed where the motor stops helping, not top speed." })
+    ];
+    ["pedal", "throttle"].forEach(function (g) {
+      var list = el("div", { "class": "choices" }, SPEEDS.filter(function (s) { return s.group === g; }).map(function (s) {
+        return choice(s.label, "", function () {
+          state.speed = s; state.noReason = null;
+          if (s.cls === 3) go("age"); else go("result");
+        });
+      }));
+      kids.push(el("div", { "class": "sgroup" }, [
+        el("h3", { "class": "sg", text: SPEED_GROUPS[g][0] }),
+        el("p", { "class": "hint", text: SPEED_GROUPS[g][1] }),
+        list
+      ]));
+    });
+    kids.push(backLink());
+    return el("div", { "class": "card" }, kids);
   }
 
   function stepAge() {
@@ -505,7 +532,7 @@ input[type="number"] {
     var cls = state.speed ? state.speed.cls : null;
     var box;
     if (cls) {
-      var top = cls === 3 ? "28 MPH, pedal assist" : cls === 2 ? "20 MPH, throttle" : "20 MPH, pedal assist";
+      var top = cls === 3 ? "Pedal assist, stops at 28 MPH" : cls === 2 ? "Throttle, stops at 20 MPH" : "Pedal assist, stops at 20 MPH";
       box = el("div", { "class": "result yes" }, [
         el("span", { "class": "badge", text: "Result" }),
         el("p", { "class": "verdict", text: "It is a Class " + cls + " e-bike." }),
@@ -513,15 +540,14 @@ input[type="number"] {
         el("ul", { "class": "facts" }, [
           el("li", {}, [el("span", { text: "Motor" }), el("b", { text: state.watts + " W" })]),
           el("li", {}, [el("span", { text: "Class " + cls }), el("b", { text: top })]),
-          el("li", {}, [el("span", { text: "Rider age" }), el("b", { text: state.age != null ? String(state.age) : "Not given" })])
-        ])
+          cls === 3 ? el("li", {}, [el("span", { text: "Rider age" }), el("b", { text: state.age != null ? String(state.age) : "Not given" })]) : null
+        ].filter(Boolean))
       ]);
       var rules = el("ul", { "class": "rules" }, chandlerRules(cls, state.age).map(function (x) {
         return el("li", { "class": x.warn ? "warn" : "" }, [el("span", { "class": "tx", text: x.text }), el("span", { "class": "chip", text: x.tag })]);
       }));
-      var card = el("div", { "class": "card" }, [el("h2", { "class": "q", text: "Chandler rules" }), rules]);
-      var codeBtn = tile("Chandler City Code", "Read the e-bike sections.", false, function () { go("code"); });
-      return el("div", { "class": "stack" }, [mainLink(false), box, card, codeBtn, actions()]);
+      var card = el("div", { "class": "card" }, [el("h2", { "class": "q", text: "Possible City Code Violations" }), rules]);
+      return el("div", { "class": "stack" }, [mainLink(false), box, card, actions()]);
     }
     var why;
     if (state.noReason === "watts") {
@@ -541,9 +567,16 @@ input[type="number"] {
   }
 
   function actions() {
-    var r = el("button", { type: "button", "class": "primary", text: "Classify another conveyance" });
-    r.onclick = function () { state = fresh(); state.step = "pedals"; state.stack = ["home"]; render(); };
-    return el("div", { "class": "stack", "style": "gap:8px" }, [r, mainLink(false)]);
+    var r = tile("Is it an e-bike?", "Start another 3 question test", true, function () { state = fresh(); state.step = "pedals"; state.stack = ["home"]; render(); });
+    return el("div", { "class": "stack" }, [
+      r,
+      tileLink("Quick Reference (PDF) \u2197", "", PDF),
+      el("div", { "class": "pair" }, [
+        tile("Chandler City Code", "E-bike rules for Chandler.", false, function () { go("code"); }),
+        tile("Definitions and Statutes", "ARS 28-101 and violations.", false, function () { go("defs"); })
+      ]),
+      mainLink(false)
+    ]);
   }
 
   function stepCode() {
