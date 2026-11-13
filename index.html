@@ -687,9 +687,12 @@ function makeQR(text) {
     var skip = el("button", { type: "button", "class": "link", text: "Skip. Age unknown" });
     skip.onclick = function () { state.age = null; go("result"); };
     setTimeout(function () { try { input.focus(); } catch (x) {} }, 0);
-    return el("div", { "class": "card" }, [
-      el("p", { "class": "hint", text: "Chandler has age rules for Class 3 e-bikes." }),
-      form, skip, backLink()
+    return el("div", { "class": "stack" }, [
+      resultBox(3, false),
+      el("div", { "class": "card" }, [
+        el("p", { "class": "hint", text: "That ends the 3 question test. Chandler has specific rules for Class 3 e-bikes, so there is one more question." }),
+        form, skip, backLink()
+      ])
     ]);
   }
 
@@ -708,21 +711,25 @@ function makeQR(text) {
     return r;
   }
 
+  function resultBox(cls, withAge) {
+    var top = cls === 3 ? "Pedal assist, stops at 28 MPH" : cls === 2 ? "Throttle, stops at 20 MPH" : "Pedal assist, stops at 20 MPH";
+    return el("div", { "class": "result yes" }, [
+      el("span", { "class": "badge", text: "Result" }),
+      el("p", { "class": "verdict", text: "It is a Class " + cls + " e-bike." }),
+      el("p", { "class": "why", text: state.speed.why }),
+      el("ul", { "class": "facts" }, [
+        el("li", {}, [el("span", { text: "Motor" }), el("b", { text: state.watts + " W" })]),
+        el("li", {}, [el("span", { text: "Class " + cls }), el("b", { text: top })]),
+        cls === 3 && withAge ? el("li", {}, [el("span", { text: "Rider age" }), el("b", { text: state.age != null ? String(state.age) : "Not given" })]) : null
+      ].filter(Boolean))
+    ]);
+  }
+
   function stepResult() {
     var cls = state.speed ? state.speed.cls : null;
     var box;
     if (cls) {
-      var top = cls === 3 ? "Pedal assist, stops at 28 MPH" : cls === 2 ? "Throttle, stops at 20 MPH" : "Pedal assist, stops at 20 MPH";
-      box = el("div", { "class": "result yes" }, [
-        el("span", { "class": "badge", text: "Result" }),
-        el("p", { "class": "verdict", text: "It is a Class " + cls + " e-bike." }),
-        el("p", { "class": "why", text: state.speed.why }),
-        el("ul", { "class": "facts" }, [
-          el("li", {}, [el("span", { text: "Motor" }), el("b", { text: state.watts + " W" })]),
-          el("li", {}, [el("span", { text: "Class " + cls }), el("b", { text: top })]),
-          cls === 3 ? el("li", {}, [el("span", { text: "Rider age" }), el("b", { text: state.age != null ? String(state.age) : "Not given" })]) : null
-        ].filter(Boolean))
-      ]);
+      box = resultBox(cls, true);
       var rules = el("ul", { "class": "rules" }, chandlerRules(cls, state.age).map(function (x) {
         return el("li", { "class": x.warn ? "warn" : "" }, [el("span", { "class": "tx", text: x.text }), el("span", { "class": "chip", text: x.tag })]);
       }));
