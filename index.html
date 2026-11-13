@@ -88,10 +88,21 @@ button:hover { border-color: var(--accent); }
 button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
 button.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); justify-content: center; text-align: center; }
 button.link { background: none; border: none; padding: 8px 0; min-height: 0; color: var(--muted); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; justify-content: flex-start; align-self: flex-start; }
-.tile { flex-direction: column; align-items: flex-start; gap: 4px; padding: 18px 16px; }
+.tile { flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 4px; padding: 18px 16px; }
 .tile .t { font: 700 1.35rem/1.1 var(--font-display); }
 .tile small { color: inherit; opacity: .82; font-size: 15px; }
-.tile.main { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.tile.main { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); padding-block: 22px; }
+.tile.main .t { font-size: 1.6rem; }
+.tile.main { align-items: center; text-align: center; text-transform: uppercase; }
+.tile.main small { letter-spacing: .08em; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pair .tile { min-width: 0; }
+.pair .tile .t { font-size: 1.2rem; }
+a.tile { font: 600 1.05rem/1.2 var(--font-body); color: var(--fg); background: var(--surface); border: 1.5px solid var(--line); border-radius: 10px; min-height: 52px; text-decoration: none; display: flex; }
+a.tile:hover { border-color: var(--accent); }
+a.tile small { font-weight: 400; }
+a.tile.slim { flex-direction: row; align-items: center; justify-content: center; text-align: center; height: 60px; min-height: 0; padding: 0 16px; }
+a.tile.slim .t { font-size: 1.2rem; }
 a.ext { color: var(--link); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; display: inline-block; padding: 6px 0; }
 form { display: flex; flex-direction: column; gap: 12px; }
 label { font-weight: 600; }
@@ -346,6 +357,12 @@ input[type="number"] {
     b.onclick = fn; return b;
   }
 
+  function tileLink(title, sub, href) {
+    var kids = [el("span", { "class": "t", text: title })];
+    if (sub) kids.push(el("small", { text: sub }));
+    return el("a", { "class": "tile" + (sub ? "" : " slim"), href: href, target: "_blank", rel: "noopener noreferrer" }, kids);
+  }
+
   /* Header band. Logo files go next to index.html as patch.png and wings.png; until then a placeholder shows. */
   function logoSlot(src, alt, ph, extra) {
     var slot = el("div", { "class": "logo" + (extra ? " " + extra : "") });
@@ -388,12 +405,13 @@ input[type="number"] {
 
   /* Screens */
   function stepHome() {
-    var pdf = el("a", { "class": "ext", href: PDF, target: "_blank", rel: "noopener noreferrer", text: "Quick reference (PDF) ↗" });
     return el("div", { "class": "stack" }, [
-      tile("Classify a Conveyance", "Is it an e-bike? Answer a few questions.", true, function () { go("pedals"); }),
-      tile("Chandler City Code", "E-bike rules for the City of Chandler.", false, function () { go("code"); }),
-      tile("Definitions and statutes", "ARS 28-101 and common citable violations.", false, function () { go("defs"); }),
-      pdf
+      tile("Is it an e-bike?", "The 3 questions test.", true, function () { go("pedals"); }),
+      tileLink("Quick Reference (PDF) \u2197", "", PDF),
+      el("div", { "class": "pair" }, [
+        tile("Chandler City Code", "E-bike rules for Chandler.", false, function () { go("code"); }),
+        tile("Definitions and Statutes", "ARS 28-101 and violations.", false, function () { go("defs"); })
+      ])
     ]);
   }
 
@@ -437,7 +455,7 @@ input[type="number"] {
     var list = el("div", { "class": "choices" }, SPEEDS.map(function (s) {
       return choice(s.label, s.sub, function () {
         state.speed = s; state.noReason = null;
-        if (s.cls) go("age"); else go("result");
+        if (s.cls === 3) go("age"); else go("result");
       });
     }));
     return el("div", { "class": "card" }, [el("h2", { "class": "q", text: "How fast does it go?" }), list, backLink()]);
@@ -463,7 +481,7 @@ input[type="number"] {
     skip.onclick = function () { state.age = null; go("result"); };
     setTimeout(function () { try { input.focus(); } catch (x) {} }, 0);
     return el("div", { "class": "card" }, [
-      el("p", { "class": "hint", text: "Chandler has age rules for e-bikes." }),
+      el("p", { "class": "hint", text: "Chandler has age rules for Class 3 e-bikes." }),
       form, skip, backLink()
     ]);
   }
@@ -503,7 +521,7 @@ input[type="number"] {
       }));
       var card = el("div", { "class": "card" }, [el("h2", { "class": "q", text: "Chandler rules" }), rules]);
       var codeBtn = tile("Chandler City Code", "Read the e-bike sections.", false, function () { go("code"); });
-      return el("div", { "class": "stack" }, [box, card, codeBtn, actions()]);
+      return el("div", { "class": "stack" }, [mainLink(false), box, card, codeBtn, actions()]);
     }
     var why;
     if (state.noReason === "watts") {
@@ -519,7 +537,7 @@ input[type="number"] {
       why
     ]);
     var charges = refCard("Common citable violations", "Tap a statute to read what it says.", STATUTES);
-    return el("div", { "class": "stack" }, [box, charges, actions()]);
+    return el("div", { "class": "stack" }, [mainLink(false), box, charges, actions()]);
   }
 
   function actions() {
