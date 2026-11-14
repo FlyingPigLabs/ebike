@@ -75,7 +75,7 @@ main { max-width: 34rem; margin: 0 auto; display: flex; flex-direction: column; 
 .band { background: var(--band); color: var(--band-fg); border-radius: 14px; border-bottom: 4px solid var(--gold); padding: 14px; display: flex; align-items: center; gap: 12px; }
 .band .title { flex: 1; min-width: 0; text-align: center; display: flex; flex-direction: column; gap: 4px; }
 .kicker { font: 600 12px/1.1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
-h1 { margin: 0; font: 700 clamp(1.05rem, 5.2vw, 1.9rem)/1.1 var(--font-display); }
+h1 { margin: 0; font: 700 clamp(.9rem, 4.3vw, 1.5rem)/1.1 var(--font-display); text-transform: uppercase; letter-spacing: .02em; }
 h1 .ln { display: block; white-space: nowrap; }
 h1.one { white-space: nowrap; }
 h1.one .ln { display: inline; }
@@ -112,9 +112,10 @@ button.link { background: none; border: none; padding: 8px 0; min-height: 0; col
 .tile .t { font: 700 1.35rem/1.1 var(--font-display); }
 .tile small { color: inherit; opacity: .82; font-size: 15px; }
 .tile.main { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); padding-block: 22px; }
-.tile.main .t { font-size: 1.6rem; }
+.tile.main .t { font-size: clamp(.7rem, 3.8vw, 1.15rem); white-space: nowrap; letter-spacing: .01em; }
 .tile.main { align-items: center; text-align: center; text-transform: uppercase; }
-.tile.main small { letter-spacing: .08em; }
+.tile.main small { letter-spacing: .02em; font-size: .82rem; white-space: nowrap; }
+.tile.main { box-shadow: 0 6px 0 rgba(0, 0, 0, .28), 0 10px 18px rgba(15, 44, 82, .35); outline: 3px solid var(--gold); outline-offset: 2px; margin-bottom: 6px; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .pair .tile { min-width: 0; }
 .pair .tile .t { font-size: 1.2rem; }
@@ -122,7 +123,11 @@ a.tile { font: 600 1.05rem/1.2 var(--font-body); color: var(--fg); background: v
 a.tile:hover { border-color: var(--accent); }
 a.tile small { font-weight: 400; }
 a.tile.slim { flex-direction: row; align-items: center; justify-content: center; text-align: center; height: 60px; min-height: 0; padding: 0 16px; }
-a.tile.slim .t { font-size: 1.2rem; }
+a.tile.slim .t { font-size: clamp(.78rem, 3.8vw, 1.15rem); white-space: nowrap; }
+a.tile.fine { height: auto; min-height: 60px; padding-block: 12px; }
+a.tile.fine .t { font-size: clamp(.78rem, 3.8vw, 1.15rem); white-space: nowrap; }
+.finebar { padding-top: 6px; }
+.finebar[hidden] { display: none; }
 a.ext { color: var(--link); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; display: inline-block; padding: 6px 0; }
 form { display: flex; flex-direction: column; gap: 12px; }
 label { font-weight: 600; }
@@ -179,6 +184,7 @@ input[type="number"] {
   <header class="band" id="band"></header>
   <div class="progress" id="progress" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   <section id="stage" aria-live="polite"></section>
+  <div class="finebar" id="fineBar"></div>
   <div class="sharebar"><button type="button" class="sharebtn" id="shareBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M7.5 7.5 12 3l4.5 4.5"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg>Share</button></div>
 </main>
 
@@ -354,6 +360,7 @@ function makeQR(text) {
   var CITY_GUIDE = "https://www.chandleraz.gov/sites/default/files/departments/transportation/City-of-Chandler-E-Bike-Safety-and-Information-Guide.pdf";
   var CITY_NEWS = "https://www.chandleraz.gov/news-center/chandler-adopts-ordinance-add-e-bike-regulations-city-code";
   var PDF = "quick-reference.pdf";
+  var FINES = "https://www.chandleraz.gov/sites/default/files/Chandler-Municipal-Court-Bond-Card.pdf";
 
   /* Arizona statutes for conveyances that are NOT e-bikes. Order follows the Quick Reference PDF. */
   var STATUTES = [
@@ -547,10 +554,16 @@ function makeQR(text) {
     b.onclick = fn; return b;
   }
   function tile(title, sub, main, fn) {
-    var b = el("button", { type: "button", "class": "tile" + (main ? " main" : "") }, [el("span", { "class": "t", text: title }), el("small", { text: sub })]);
+    var kids = [el("span", { "class": "t", text: title })]; if (sub) kids.push(el("small", { text: sub }));
+    var b = el("button", { type: "button", "class": "tile" + (main ? " main" : "") }, kids);
     b.onclick = fn; return b;
   }
 
+  function fineLink() {
+    var a = tileLink("Chandler City Court Fine Schedule (PDF)\u00a0\u2197", "", FINES);
+    a.className += " fine";
+    return a;
+  }
   function tileLink(title, sub, href) {
     var kids = [el("span", { "class": "t", text: title })];
     if (sub) kids.push(el("small", { text: sub }));
@@ -568,7 +581,7 @@ function makeQR(text) {
   function buildBand() {
     band.textContent = "";
     band.appendChild(logoSlot("patch.png", "Chandler Police Department patch", "Patch logo", ""));
-    band.appendChild(el("div", { "class": "title" }, [el("h1", {}, [el("span", { "class": "ln", text: "E-Bike" }), txt(" "), el("span", { "class": "ln", text: "or" }), txt(" "), el("span", { "class": "ln", text: "E-Motorcycle" })])]));
+    band.appendChild(el("div", { "class": "title" }, [el("h1", { "class": "one" }, [el("span", { "class": "ln", text: "Is it an e-bike?" })])]));
     band.appendChild(logoSlot("wings.png", "Traffic Motor Wings", "Wings logo", "wide"));
   }
 
@@ -600,12 +613,12 @@ function makeQR(text) {
   /* Screens */
   function stepHome() {
     return el("div", { "class": "stack" }, [
-      tile("Is it an e-bike?", "The 3 questions test.", true, function () { go("pedals"); }),
-      tileLink("Quick Reference (PDF) \u2197", "", PDF),
+      tile("Tap here to start the 3 question test", "", true, function () { go("pedals"); }),
       el("div", { "class": "pair" }, [
         tile("Chandler City Code", "E-bike rules for Chandler.", false, function () { go("code"); }),
         tile("Definitions and Statutes", "ARS 28-101 and violations.", false, function () { go("defs"); })
-      ])
+      ]),
+      tileLink("Quick Reference (PDF) \u2197", "", PDF)
     ]);
   }
 
@@ -750,11 +763,11 @@ function makeQR(text) {
       why
     ]);
     var charges = refCard("Common citable violations", "Tap a statute to read what it says.", STATUTES);
-    return el("div", { "class": "stack" }, [mainLink(false), box, charges, actions()]);
+    return el("div", { "class": "stack" }, [mainLink(false), box, charges, fineLink(), actions()]);
   }
 
   function actions() {
-    var r = tile("Is it an e-bike?", "Start another 3 question test", true, function () { state = fresh(); state.step = "pedals"; state.stack = ["home"]; render(); });
+    var r = tile("Tap here to start another 3 question test", "", true, function () { state = fresh(); state.step = "pedals"; state.stack = ["home"]; render(); });
     return el("div", { "class": "stack" }, [
       r,
       tileLink("Quick Reference (PDF) \u2197", "", PDF),
@@ -789,6 +802,7 @@ function makeQR(text) {
       mainLink(false),
       refCard("Definitions", "From ARS 28-101. Tap a term to read the summary.", DEFS),
       refCard("Arizona statutes", "Common citable violations when a conveyance is not an e-bike.", STATUTES),
+      fineLink(),
       mainLink(true)
     ]);
   }
@@ -797,6 +811,8 @@ function makeQR(text) {
     stage.textContent = "";
     var map = { home: stepHome, pedals: stepPedals, watts: stepWatts, speed: stepSpeed, age: stepAge, result: stepResult, code: stepCode, defs: stepDefs };
     stage.appendChild(map[state.step]());
+    var notEbike = state.step === "result" && !(state.speed && state.speed.cls);
+    fineBar.hidden = state.step === "defs" || notEbike;
     var n = { pedals: 1, watts: 2, speed: 3, age: 4 }[state.step] || 0;
     for (var i = 0; i < bars.length; i++) bars[i].className = i < n ? "on" : "";
     progress.style.display = n ? "flex" : "none";
@@ -808,6 +824,8 @@ function makeQR(text) {
     h.classList.add("one");
     if (h.scrollWidth > h.clientWidth + 1) h.classList.remove("one");
   }
+  var fineBar = document.getElementById("fineBar");
+  fineBar.appendChild(fineLink());
   buildBand();
   fitTitle();
   window.addEventListener("resize", fitTitle);
