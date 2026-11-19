@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>html{color-scheme:light dark}body{margin:0}
 /* Share button and QR pop-up */
+.mainrow { display: flex; justify-content: center; padding-top: 14px; }
+.mainrow[hidden] { display: none; }
 .otherlink { text-align: center; padding-top: 14px; font: 500 .95rem/1.3 var(--font-body); }
 .otherlink a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .sharebar { display: flex; justify-content: center; padding-top: 6px; }
@@ -128,7 +130,7 @@ a.tile.slim { flex-direction: row; align-items: center; justify-content: center;
 a.tile.slim .t { font-size: clamp(.78rem, 3.8vw, 1.15rem); white-space: nowrap; }
 a.tile.fine { height: auto; min-height: 60px; padding-block: 12px; }
 a.tile.fine .t { font-size: clamp(.78rem, 3.8vw, 1.15rem); white-space: nowrap; }
-.finebar { padding-top: 6px; }
+.finebar { padding-top: 12px; }
 .finebar[hidden] { display: none; }
 a.ext { color: var(--link); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; display: inline-block; padding: 6px 0; }
 form { display: flex; flex-direction: column; gap: 12px; }
@@ -188,6 +190,7 @@ input[type="number"] {
   <section id="stage" aria-live="polite"></section>
   <div class="finebar" id="fineBar"></div>
   <div class="otherlink"><a href="quick-reference-other-vehicles.pdf" target="_blank" rel="noopener noreferrer">Quick Reference: Other Vehicle Types (PDF) ↗</a></div>
+  <div class="mainrow" id="mainRow"></div>
   <div class="sharebar"><button type="button" class="sharebtn" id="shareBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M7.5 7.5 12 3l4.5 4.5"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg>Share</button></div>
 </main>
 
@@ -539,7 +542,7 @@ function makeQR(text) {
     return n;
   }
   function txt(s) { return document.createTextNode(s); }
-  function go(step) { state.stack.push(state.step); state.step = step; render(); }
+  function go(step) { if (step === state.step) return; state.stack.push(state.step); state.step = step; render(); }
   function back() { state.step = state.stack.pop() || "home"; render(); }
   function restart() { state = fresh(); render(); }
   function backLink() {
@@ -562,6 +565,17 @@ function makeQR(text) {
     b.onclick = fn; return b;
   }
 
+  /* Same three buttons at the bottom of every screen. */
+  function footerButtons() {
+    return el("div", { "class": "stack" }, [
+      el("div", { "class": "pair" }, [
+        tile("Chandler City Code", "E-bike rules for Chandler.", false, function () { go("code"); }),
+        tile("Definitions and Statutes", "ARS 28-101 and violations.", false, function () { go("defs"); })
+      ]),
+      fineLink(),
+      tileLink("E-Bike Quick Reference (PDF) \u2197", "", PDF)
+    ]);
+  }
   function fineLink() {
     var a = tileLink("Chandler City Court Fine Schedule (PDF)\u00a0\u2197", "", FINES);
     a.className += " fine";
@@ -617,11 +631,6 @@ function makeQR(text) {
   function stepHome() {
     return el("div", { "class": "stack" }, [
       tile("Tap here to start the 3 question test", "", true, function () { go("pedals"); }),
-      el("div", { "class": "pair" }, [
-        tile("Chandler City Code", "E-bike rules for Chandler.", false, function () { go("code"); }),
-        tile("Definitions and Statutes", "ARS 28-101 and violations.", false, function () { go("defs"); })
-      ]),
-      tileLink("Quick Reference (PDF) \u2197", "", PDF)
     ]);
   }
 
@@ -750,7 +759,7 @@ function makeQR(text) {
         return el("li", { "class": x.warn ? "warn" : "" }, [el("span", { "class": "tx", text: x.text }), el("span", { "class": "chip", text: x.tag })]);
       }));
       var card = el("div", { "class": "card" }, [el("h2", { "class": "q", text: "Possible City Code Violations" }), rules]);
-      return el("div", { "class": "stack" }, [mainLink(false), box, card, actions()]);
+      return el("div", { "class": "stack" }, [mainLink(false), box, card, actions(true)]);
     }
     var why;
     if (state.noReason === "watts") {
@@ -770,15 +779,10 @@ function makeQR(text) {
   }
 
   function actions(withFine) {
-    var r = tile("Tap here to start another 3 question test", "", true, function () { state = fresh(); state.step = "pedals"; state.stack = ["home"]; render(); });
+    var r = tile("Start another 3 question test", "", true, function () { state = fresh(); state.step = "pedals"; state.stack = ["home"]; render(); });
     return el("div", { "class": "stack" }, [
-      r,
-      tileLink("Quick Reference (PDF) \u2197", "", PDF),
-      el("div", { "class": "pair" }, [
-        tile("Chandler City Code", "E-bike rules for Chandler.", false, function () { go("code"); }),
-        tile("Definitions and Statutes", "ARS 28-101 and violations.", false, function () { go("defs"); })
-      ])
-    ].concat(withFine ? [fineLink()] : [], [mainLink(false)]));
+      r
+    ]);
   }
 
   function stepCode() {
@@ -794,8 +798,7 @@ function makeQR(text) {
       mainLink(false),
       refCard("Chandler City Code", "Chapter 13, Bicycles. Summarized from Ordinance 5164, adopted June 11, 2026, effective July 11, 2026. Tap a section to read the summary.", CITY_CODE),
       refCard("From the City’s e-bike information", "Not code sections. Posted by the City.", CITY_INFO),
-      links,
-      mainLink(true)
+      links
     ]);
   }
 
@@ -803,9 +806,7 @@ function makeQR(text) {
     return el("div", { "class": "stack" }, [
       mainLink(false),
       refCard("Definitions", "From ARS 28-101. Tap a term to read the summary.", DEFS),
-      refCard("Arizona statutes", "Common citable violations when a conveyance is not an e-bike.", STATUTES),
-      fineLink(),
-      mainLink(true)
+      refCard("Arizona statutes", "Common citable violations when a conveyance is not an e-bike.", STATUTES)
     ]);
   }
 
@@ -813,8 +814,8 @@ function makeQR(text) {
     stage.textContent = "";
     var map = { home: stepHome, pedals: stepPedals, watts: stepWatts, speed: stepSpeed, age: stepAge, result: stepResult, code: stepCode, defs: stepDefs };
     stage.appendChild(map[state.step]());
-    var notEbike = state.step === "result" && !(state.speed && state.speed.cls);
-    fineBar.hidden = state.step === "defs" || notEbike;
+    fineBar.textContent = ""; fineBar.appendChild(footerButtons());
+    mainRow.textContent = ""; mainRow.appendChild(mainLink(false)); mainRow.hidden = state.step === "home";
     var n = { pedals: 1, watts: 2, speed: 3, age: 4 }[state.step] || 0;
     for (var i = 0; i < bars.length; i++) bars[i].className = i < n ? "on" : "";
     progress.style.display = n ? "flex" : "none";
@@ -827,7 +828,7 @@ function makeQR(text) {
     if (h.scrollWidth > h.clientWidth + 1) h.classList.remove("one");
   }
   var fineBar = document.getElementById("fineBar");
-  fineBar.appendChild(fineLink());
+  var mainRow = document.getElementById("mainRow");
   buildBand();
   fitTitle();
   window.addEventListener("resize", fitTitle);
