@@ -766,10 +766,10 @@ function makeQR(text) {
       why
     ]);
     var charges = refCard("Common citable violations", "Tap a statute to read what it says.", STATUTES);
-    return el("div", { "class": "stack" }, [mainLink(false), box, charges, fineLink(), actions()]);
+    return el("div", { "class": "stack" }, [mainLink(false), box, charges, actions(true)]);
   }
 
-  function actions() {
+  function actions(withFine) {
     var r = tile("Tap here to start another 3 question test", "", true, function () { state = fresh(); state.step = "pedals"; state.stack = ["home"]; render(); });
     return el("div", { "class": "stack" }, [
       r,
@@ -777,9 +777,8 @@ function makeQR(text) {
       el("div", { "class": "pair" }, [
         tile("Chandler City Code", "E-bike rules for Chandler.", false, function () { go("code"); }),
         tile("Definitions and Statutes", "ARS 28-101 and violations.", false, function () { go("defs"); })
-      ]),
-      mainLink(false)
-    ]);
+      ])
+    ].concat(withFine ? [fineLink()] : [], [mainLink(false)]));
   }
 
   function stepCode() {
